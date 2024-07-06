@@ -25,11 +25,11 @@ module.exports = function (app) {
 
     // Check for invalid number and unit
     if (initNum === "invalid number" && initUnit === "invalid unit") {
-      return res.status(400).json({ error: "invalid number and unit" });
+      return res.status(200).json({ error: "invalid number and unit" });
     } else if (initNum === "invalid number") {
-      return res.status(400).json({ error: "invalid number" });
+      return res.status(200).json({ error: "invalid number" });
     } else if (initUnit === "invalid unit") {
-      return res.status(400).json({ error: "invalid unit" });
+      return res.status(200).json({ error: "invalid unit" });
     }
 
     let returnNum = convertHandler.convert(initNum, initUnit);
