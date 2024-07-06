@@ -13,38 +13,40 @@ function ConvertHandler() {
     if (result.includes("/")) {
       const numbers = result.split("/");
       if (numbers.length > 2) {
-        throw new Error("Invalid number");
+        return "invalid number";
       }
       result = parseFloat(numbers[0]) / parseFloat(numbers[1]);
     } else {
       result = parseFloat(result);
     }
 
+    if (isNaN(result)) {
+      return "invalid number";
+    }
+
     return result;
   };
 
   this.getUnit = function (input) {
-    let result;
     const unitRegex = /[a-zA-Z]+$/;
     const unitStr = input.match(unitRegex);
 
     if (!unitStr) {
-      throw new Error("Invalid unit");
+      return "invalid unit";
     }
 
-    result = unitStr[0].toLowerCase();
-
+    const result = unitStr[0].toLowerCase();
     const validUnits = ["gal", "l", "mi", "km", "lbs", "kg"];
     if (validUnits.includes(result)) {
-      return result;
+      return result === "l" ? "L" : result;
     }
 
-    throw new Error("Invalid unit");
+    return "invalid unit";
   };
 
   this.getReturnUnit = function (initUnit) {
     const unitMap = {
-      gal: "l",
+      gal: "L",
       l: "gal",
       mi: "km",
       km: "mi",
@@ -94,18 +96,41 @@ function ConvertHandler() {
         result = initNum / miToKm;
         break;
       default:
-        result = "invalid unit";
+        return "invalid unit";
     }
 
-    return result;
+    return parseFloat(result.toFixed(5));
   };
 
   this.getString = function (initNum, initUnit, returnNum, returnUnit) {
-    let result;
-    result = `${initNum} ${this.spellOutUnit(
+    return `${initNum} ${this.spellOutUnit(
       initUnit
     )} converts to ${returnNum} ${this.spellOutUnit(returnUnit)}`;
-    return result;
+  };
+
+  this.handleConversion = function (input) {
+    const number = this.getNum(input);
+    const unit = this.getUnit(input);
+
+    if (number === "invalid number" && unit === "invalid unit") {
+      return "invalid number and unit";
+    } else if (number === "invalid number") {
+      return "invalid number";
+    } else if (unit === "invalid unit") {
+      return "invalid unit";
+    }
+
+    const returnNum = this.convert(number, unit);
+    const returnUnit = this.getReturnUnit(unit);
+    const resultString = this.getString(number, unit, returnNum, returnUnit);
+
+    return {
+      initNum: number,
+      initUnit: unit.toLowerCase() === "l" ? "L" : unit,
+      returnNum: returnNum,
+      returnUnit: returnUnit.toLowerCase() === "l" ? "L" : returnUnit,
+      string: resultString,
+    };
   };
 }
 

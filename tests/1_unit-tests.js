@@ -3,7 +3,6 @@ let assert = chai.assert;
 const ConvertHandler = require("../controllers/convertHandler.js");
 
 let convertHandler = new ConvertHandler();
-
 suite("Unit Tests", function () {
   suite("Function convertHandler.getNum(input)", function () {
     test("Whole number input", function (done) {
@@ -27,7 +26,7 @@ suite("Unit Tests", function () {
     });
 
     test("Double-fraction input", function (done) {
-      assert.throws(() => convertHandler.getNum("3/2/3gal"), "Invalid number");
+      assert.equal(convertHandler.getNum("3/2/3gal"), "invalid number");
       done();
     });
 
@@ -39,15 +38,42 @@ suite("Unit Tests", function () {
 
   suite("Function convertHandler.getUnit(input)", function () {
     test("Valid input unit", function (done) {
-      const input = ["gal", "l", "mi", "km", "lbs", "kg"];
-      input.forEach(function (ele) {
-        assert.equal(convertHandler.getUnit(ele), ele);
+      const input = [
+        "gal",
+        "GAL",
+        "l",
+        "L",
+        "mi",
+        "MI",
+        "km",
+        "KM",
+        "lbs",
+        "LBS",
+        "kg",
+        "KG",
+      ];
+      const expected = [
+        "gal",
+        "gal",
+        "L",
+        "L",
+        "mi",
+        "mi",
+        "km",
+        "km",
+        "lbs",
+        "lbs",
+        "kg",
+        "kg",
+      ];
+      input.forEach(function (ele, i) {
+        assert.equal(convertHandler.getUnit(ele), expected[i]);
       });
       done();
     });
 
     test("Invalid input unit", function (done) {
-      assert.throws(() => convertHandler.getUnit("34g"), "Invalid unit");
+      assert.equal(convertHandler.getUnit("34g"), "invalid unit");
       done();
     });
   });
@@ -55,7 +81,7 @@ suite("Unit Tests", function () {
   suite("Function convertHandler.getReturnUnit(initUnit)", function () {
     test("Valid input units", function (done) {
       const input = ["gal", "l", "mi", "km", "lbs", "kg"];
-      const expect = ["l", "gal", "km", "mi", "kg", "lbs"];
+      const expect = ["L", "gal", "km", "mi", "kg", "lbs"];
       input.forEach(function (ele, i) {
         assert.equal(convertHandler.getReturnUnit(ele), expect[i]);
       });
@@ -88,7 +114,7 @@ suite("Unit Tests", function () {
     });
 
     test("L to Gal", function (done) {
-      assert.approximately(convertHandler.convert(1, "l"), 0.26417, 0.00001);
+      assert.approximately(convertHandler.convert(1, "L"), 0.26417, 0.00001);
       done();
     });
 

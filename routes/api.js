@@ -6,7 +6,7 @@ const ConvertHandler = require("../controllers/convertHandler.js");
 module.exports = function (app) {
   let convertHandler = new ConvertHandler();
 
-  //Index page (static HTML)
+  // Index page (static HTML)
   app.route("/").get(function (req, res) {
     res.sendFile(process.cwd() + "/views/index.html");
   });
@@ -17,34 +17,40 @@ module.exports = function (app) {
 
     // Validate the input
     if (!input) {
-      return res.status(400).json({ error: "Invalid input" });
+      return res.status(400).json({ error: "invalid input" });
     }
 
-    try {
-      let initNum = convertHandler.getNum(input);
-      let initUnit = convertHandler.getUnit(input);
-      let returnNum = convertHandler.convert(initNum, initUnit);
-      let returnUnit = convertHandler.getReturnUnit(initUnit);
-      let string = convertHandler.getString(
-        initNum,
-        initUnit,
-        returnNum,
-        returnUnit
-      );
+    let initNum = convertHandler.getNum(input);
+    let initUnit = convertHandler.getUnit(input);
 
-      res.json({
-        initNum: initNum,
-        initUnit: initUnit,
-        returnNum: returnNum,
-        returnUnit: returnUnit,
-        string: string,
-      });
-    } catch (e) {
-      res.status(400).json({ error: e.message });
+    // Check for invalid number and unit
+    if (initNum === "invalid number" && initUnit === "invalid unit") {
+      return res.status(400).json({ error: "invalid number and unit" });
+    } else if (initNum === "invalid number") {
+      return res.status(400).json({ error: "invalid number" });
+    } else if (initUnit === "invalid unit") {
+      return res.status(400).json({ error: "invalid unit" });
     }
+
+    let returnNum = convertHandler.convert(initNum, initUnit);
+    let returnUnit = convertHandler.getReturnUnit(initUnit);
+    let string = convertHandler.getString(
+      initNum,
+      initUnit,
+      returnNum,
+      returnUnit
+    );
+
+    res.json({
+      initNum: initNum,
+      initUnit: initUnit.toLowerCase() === "l" ? "L" : initUnit,
+      returnNum: returnNum,
+      returnUnit: returnUnit.toLowerCase() === "l" ? "L" : returnUnit,
+      string: string,
+    });
   });
 
-  //404 Not Found Middleware
+  // 404 Not Found Middleware
   app.use(function (req, res, next) {
     res.status(404).type("text").send("Not Found");
   });
